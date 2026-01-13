@@ -1,26 +1,133 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  --radius: 0.75rem;
+  --background: #fff7ef;
+  --foreground: #2c1f17;
+  --card: #ffffff;
+  --card-foreground: #1e1a16;
+  --popover: #ffffff;
+  --popover-foreground: #1e1a16;
+  --primary: #d06c69;
+  --primary-foreground: #ffffff;
+  --secondary: #f4d7c2;
+  --secondary-foreground: #3a291f;
+  --muted: #f7e1d4;
+  --muted-foreground: #7a5c4b;
+  --accent: #f1c7b7;
+  --accent-foreground: #32241a;
+  --destructive: #b53b46;
+  --border: #f2d3c3;
+  --input: #fff1eb;
+  --ring: #f4c8b9;
+  --chart-1: #c96d6d;
+  --chart-2: #f4a261;
+  --chart-3: #8a6e9c;
+  --chart-4: #6d9b9a;
+  --chart-5: #f2d084;
+  --sidebar: #fef8f4;
+  --sidebar-foreground: #1b1614;
+  --sidebar-primary: #d06c69;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f4d7c2;
+  --sidebar-accent-foreground: #3a291f;
+  --sidebar-border: #f2d3c3;
+  --sidebar-ring: #f4c8b9;
+}
+
+.dark {
+  --background: #1d1b1a;
+  --foreground: #f1f1f1;
+  --card: #242424;
+  --card-foreground: #f9f7f2;
+  --popover: #292929;
+  --popover-foreground: #f9f7f2;
+  --primary: #d5757f;
+  --primary-foreground: #ffffff;
+  --secondary: #3b2b28;
+  --secondary-foreground: #f9f7f2;
+  --muted: #423534;
+  --muted-foreground: #d5c5ba;
+  --accent: #3a2e2c;
+  --accent-foreground: #f9f7f2;
+  --destructive: #ff7a76;
+  --border: #383838;
+  --input: #1f1f1f;
+  --ring: #f4c8b9;
+  --chart-1: #c96d6d;
+  --chart-2: #f2b356;
+  --chart-3: #8a6e9c;
+  --chart-4: #6d9b9a;
+  --chart-5: #f2d084;
+  --sidebar: #1f1f1f;
+  --sidebar-foreground: #f9f7f2;
+  --sidebar-primary: #d06c69;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #3a2d2c;
+  --sidebar-accent-foreground: #f9f7f2;
+  --sidebar-border: #383838;
+  --sidebar-ring: #f4c8b9;
+}
+
+@layer base {
+  * {
+    @apply outline-none;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  body {
+    @apply min-h-screen text-foreground;
+    background-image: linear-gradient(
+      135deg,
+      #fff7ef 0%,
+      #fdf3e7 40%,
+      #f6e8d7 70%,
+      #ede0d0 100%
+    );
+    background-attachment: fixed;
+  }
 }
