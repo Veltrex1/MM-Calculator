@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { DateTime } from "luxon";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -50,7 +49,7 @@ type CalculationResult =
     }
   | {
       status: "ready";
-      marriedMore: DateTime;
+      marriedMore: Date;
       age: { years: number; months: number };
       weddingFuture: boolean;
     };
@@ -63,24 +62,98 @@ const ageLabel = (years: number, months: number) => {
   if (months || (!years && !months)) {
     parts.push(`${months} month${months === 1 ? "" : "s"}`);
   }
-  return parts.join(", ");
+  return parts.join(", " );
+};
+
+const getTimeZoneOffsetMillis = (timeZone: string, date: Date) => {
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23",
+  });
+
+  const parts = formatter
+    .formatToParts(date)
+    .filter((part) => part.type !== "literal")
+    .reduce((acc: Record<string, string>, part) => {
+      acc[part.type] = part.value;
+      return acc;
+    }, {} as Record<string, string>);
+
+  const zoned = Date.UTC(
+    Number(parts.year ?? "0"),
+    Number(parts.month ?? "1") - 1,
+    Number(parts.day ?? "1"),
+    Number(parts.hour ?? "0"),
+    Number(parts.minute ?? "0"),
+    Number(parts.second ?? "0")
+  );
+
+  return zoned - date.getTime();
+};
+
+const parseDateOnly = (value: string) => {
+  if (!value) {
+    return new Date(NaN);
+  }
+
+  return new Date(`${value}T00:00:00Z`);
+};
+
+const parseDateTimeInZone = (value: string, timeZone: string) => {
+  if (!value) {
+    return new Date(NaN);
+  }
+
+  const [datePart, timePart = "00:00"] = value.split("T");
+  const [year, month, day] = datePart.split("-").map(Number);
+  const [hour = 0, minute = 0, second = 0] = timePart
+    .split(":")
+    .map(Number);
+  const base = new Date(Date.UTC(year, month - 1, day, hour, minute, second));
+  const offset = getTimeZoneOffsetMillis(timeZone, base);
+  return new Date(base.getTime() - offset);
+};
+
+const monthDifference = (start: Date, end: Date) => {
+  if (!isFinite(start.getTime()) || !isFinite(end.getTime())) {
+    return 0;
+  }
+
+  let months =
+    (end.getUTCFullYear() - start.getUTCFullYear()) * 12 +
+    (end.getUTCMonth() - start.getUTCMonth());
+
+  const anchor = new Date(start.getTime());
+  anchor.setUTCMonth(anchor.getUTCMonth() + months);
+
+  if (end.getTime() < anchor.getTime()) {
+    months -= 1;
+  }
+
+  return Math.max(months, 0);
 };
 
 const explainMarriedMoreDate = ({
   birth,
   wedding,
 }: {
-  birth: DateTime;
-  wedding: DateTime;
+  birth: Date;
+  wedding: Date;
 }): CalculationResult => {
-  if (!birth.isValid || !wedding.isValid) {
+  if (!isFinite(birth.getTime()) || !isFinite(wedding.getTime())) {
     return {
       status: "error",
       message: "Double-check that each calendar entry is complete.",
     };
   }
 
-  if (wedding <= birth) {
+  if (wedding.getTime() <= birth.getTime()) {
     return {
       status: "error",
       message:
@@ -88,14 +161,12 @@ const explainMarriedMoreDate = ({
     };
   }
 
-  const durationBeforeMarriage = wedding.diff(birth, ["milliseconds"]);
-  const marriedMore = wedding.plus(durationBeforeMarriage);
-  const totalMonths = Math.floor(
-    marriedMore.diff(birth, ["months"]).months ?? 0
-  );
+  const durationBeforeMarriage = wedding.getTime() - birth.getTime();
+  const marriedMore = new Date(wedding.getTime() + durationBeforeMarriage);
+  const totalMonths = monthDifference(birth, marriedMore);
   const years = Math.floor(totalMonths / 12);
   const months = totalMonths % 12;
-  const weddingFuture = wedding > DateTime.now();
+  const weddingFuture = wedding.getTime() > Date.now();
 
   return {
     status: "ready",
@@ -103,6 +174,21 @@ const explainMarriedMoreDate = ({
     age: { years, months },
     weddingFuture,
   };
+};
+
+const formatMarriedMoreDate = (date: Date, mode: Mode, timeZone: string) => {
+  if (mode === "advanced") {
+    return new Intl.DateTimeFormat("en-US", {
+      dateStyle: "full",
+      timeStyle: "short",
+      timeZone,
+      hourCycle: "h23",
+    }).format(date);
+  }
+
+  return new Intl.DateTimeFormat("en-US", {
+    dateStyle: "full",
+  }).format(date);
 };
 
 export default function Home() {
@@ -133,12 +219,8 @@ export default function Home() {
         };
       }
 
-      const birth = DateTime.fromISO(birthDate, { zone: "UTC" }).startOf(
-        "day"
-      );
-      const wedding = DateTime.fromISO(weddingDate, { zone: "UTC" }).startOf(
-        "day"
-      );
+      const birth = parseDateOnly(birthDate);
+      const wedding = parseDateOnly(weddingDate);
       return explainMarriedMoreDate({ birth, wedding });
     }
 
@@ -149,12 +231,8 @@ export default function Home() {
       };
     }
 
-    const birth = DateTime.fromISO(advancedBirth, {
-      zone: birthTimezone,
-    });
-    const wedding = DateTime.fromISO(advancedWedding, {
-      zone: weddingTimezone,
-    });
+    const birth = parseDateTimeInZone(advancedBirth, birthTimezone);
+    const wedding = parseDateTimeInZone(advancedWedding, weddingTimezone);
     return explainMarriedMoreDate({ birth, wedding });
   }, [
     mode,
@@ -168,15 +246,11 @@ export default function Home() {
 
   const marriedMoreLabel =
     result.status === "ready"
-      ? mode === "advanced"
-        ? result.marriedMore
-            .setZone(weddingTimezone)
-            .toLocaleString(DateTime.DATETIME_FULL)
-        : result.marriedMore.toLocaleString(DateTime.DATE_FULL)
+      ? formatMarriedMoreDate(result.marriedMore, mode, weddingTimezone)
       : "—";
 
   const ageDetail =
-    result.status === "ready" && result.age
+    result.status === "ready"
       ? ageLabel(result.age.years, result.age.months)
       : "—";
 
@@ -282,9 +356,7 @@ export default function Home() {
                         id="birth-datetime"
                         type="datetime-local"
                         value={advancedBirth}
-                        onChange={(event) =>
-                          setAdvancedBirth(event.target.value)
-                        }
+                        onChange={(event) => setAdvancedBirth(event.target.value)}
                       />
                     </div>
                     <div className="flex flex-col gap-1">
@@ -315,15 +387,11 @@ export default function Home() {
                         id="wedding-datetime"
                         type="datetime-local"
                         value={advancedWedding}
-                        onChange={(event) =>
-                          setAdvancedWedding(event.target.value)
-                        }
+                        onChange={(event) => setAdvancedWedding(event.target.value)}
                       />
                     </div>
                     <div className="flex flex-col gap-1">
-                      <Label htmlFor="wedding-timezone">
-                        Wedding timezone
-                      </Label>
+                      <Label htmlFor="wedding-timezone">Wedding timezone</Label>
                       <Select
                         value={weddingTimezone}
                         onValueChange={(value) => setWeddingTimezone(value)}
@@ -344,7 +412,7 @@ export default function Home() {
                 </div>
                 <p className="pt-4 text-xs text-muted-foreground">
                   Advanced mode accounts for the precise time and location of
-                  each milestone, so the moment you hit MarriedMore carries the
+                  each milestone so the moment you hit MarriedMore carries the
                   exact zone you expect.
                 </p>
               </TabsContent>
@@ -361,12 +429,10 @@ export default function Home() {
             </div>
             <div className="flex flex-col gap-1">
               <p className="text-sm text-muted-foreground">
-                You’ll be married more than not married at:{" "}
-                <span className="font-medium text-slate-900">{ageDetail}</span>
+                You’ll be married more than not married at: <span className="font-medium text-slate-900">{ageDetail}</span>
               </p>
               <p className="text-sm text-muted-foreground">
-                At this moment, married time becomes greater than unmarried
-                time.
+                At this moment, married time becomes greater than unmarried time.
               </p>
               {result.status === "ready" && result.weddingFuture && (
                 <p className="text-xs text-muted-foreground">
@@ -378,9 +444,7 @@ export default function Home() {
                 <p className="text-sm text-destructive">{result.message}</p>
               )}
               {result.status === "idle" && (
-                <p className="text-sm text-muted-foreground">
-                  {result.message}
-                </p>
+                <p className="text-sm text-muted-foreground">{result.message}</p>
               )}
             </div>
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
