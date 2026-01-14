@@ -244,7 +244,12 @@ export default function Home() {
     weddingTimezone,
   ]);
 
-  const readyResult = result.status === "ready" ? result : null;
+  const isReadyResult = (
+    candidate: CalculationResult
+  ): candidate is Extract<CalculationResult, { status: "ready" }> =>
+    candidate.status === "ready";
+
+  const readyResult = isReadyResult(result) ? result : null;
 
   const marriedMoreLabel = readyResult
     ? formatMarriedMoreDate(readyResult.marriedMore, mode, weddingTimezone)
