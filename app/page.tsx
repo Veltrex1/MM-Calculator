@@ -210,7 +210,7 @@ export default function Home() {
     };
   }, []);
 
-  const result = useMemo(() => {
+  const result = useMemo<CalculationResult>(() => {
     if (mode === "basic") {
       if (!birthDate || !weddingDate) {
         return {
