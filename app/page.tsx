@@ -244,15 +244,15 @@ export default function Home() {
     weddingTimezone,
   ]);
 
-  const marriedMoreLabel =
-    result.status === "ready"
-      ? formatMarriedMoreDate(result.marriedMore, mode, weddingTimezone)
-      : "—";
+  const readyResult = result.status === "ready" ? result : null;
 
-  const ageDetail =
-    result.status === "ready"
-      ? ageLabel(result.age.years, result.age.months)
-      : "—";
+  const marriedMoreLabel = readyResult
+    ? formatMarriedMoreDate(readyResult.marriedMore, mode, weddingTimezone)
+    : "—";
+
+  const ageDetail = readyResult
+    ? ageLabel(readyResult.age.years, readyResult.age.months)
+    : "—";
 
   const copyDisabled = result.status !== "ready";
 
