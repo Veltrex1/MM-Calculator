@@ -261,6 +261,30 @@ export default function Home() {
 
   const copyDisabled = result.status !== "ready";
 
+  const copyToClipboard = useCallback(async (text: string) => {
+    if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return;
+    }
+
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.style.position = "fixed";
+    textarea.style.top = "0";
+    textarea.style.left = "0";
+    textarea.style.width = "1px";
+    textarea.style.height = "1px";
+    textarea.style.padding = "0";
+    textarea.style.border = "none";
+    textarea.style.outline = "none";
+    textarea.style.boxShadow = "none";
+    textarea.style.background = "transparent";
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    document.body.removeChild(textarea);
+  }, []);
+
   const handleCopy = useCallback(async () => {
     if (copyDisabled || result.status !== "ready") {
       return;
@@ -279,7 +303,7 @@ export default function Home() {
     }
 
     try {
-      await navigator.clipboard.writeText(explanation.join("\n"));
+      await copyToClipboard(explanation.join("\n"));
       setCopyLabel("Copied!");
     } catch {
       setCopyLabel("Copy failed");
@@ -292,7 +316,7 @@ export default function Home() {
     copyTimeout.current = setTimeout(() => {
       setCopyLabel("Copy result");
     }, 2000);
-  }, [ageDetail, copyDisabled, marriedMoreLabel, result]);
+  }, [ageDetail, copyDisabled, copyToClipboard, marriedMoreLabel, result]);
 
   return (
     <main className="flex min-h-screen items-center justify-center px-4 py-14 sm:py-20">
@@ -302,7 +326,7 @@ export default function Home() {
             MarriedMore
           </p>
           <h1 className="text-4xl font-serif italic text-slate-900">
-            Building stronger partnerships
+            Loving Lasting Marriage
           </h1>
         </div>
         <Card className="w-full bg-white/80 backdrop-blur">
