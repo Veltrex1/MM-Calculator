@@ -262,27 +262,41 @@ export default function Home() {
   const copyDisabled = result.status !== "ready";
 
   const copyToClipboard = useCallback(async (text: string) => {
-    if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(text);
-      return;
+    const fallbackToTextarea = () => {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.top = "0";
+      textarea.style.left = "0";
+      textarea.style.width = "1px";
+      textarea.style.height = "1px";
+      textarea.style.padding = "0";
+      textarea.style.border = "none";
+      textarea.style.outline = "none";
+      textarea.style.boxShadow = "none";
+      textarea.style.background = "transparent";
+      document.body.appendChild(textarea);
+      textarea.select();
+      const successful = document.execCommand("copy");
+      document.body.removeChild(textarea);
+      if (!successful) {
+        throw new Error("fallback copy failed");
+      }
+    };
+
+    if (
+      typeof navigator !== "undefined" &&
+      typeof navigator.clipboard !== "undefined"
+    ) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return;
+      } catch {
+        // fall through to textarea
+      }
     }
 
-    const textarea = document.createElement("textarea");
-    textarea.value = text;
-    textarea.style.position = "fixed";
-    textarea.style.top = "0";
-    textarea.style.left = "0";
-    textarea.style.width = "1px";
-    textarea.style.height = "1px";
-    textarea.style.padding = "0";
-    textarea.style.border = "none";
-    textarea.style.outline = "none";
-    textarea.style.boxShadow = "none";
-    textarea.style.background = "transparent";
-    document.body.appendChild(textarea);
-    textarea.select();
-    document.execCommand("copy");
-    document.body.removeChild(textarea);
+    fallbackToTextarea();
   }, []);
 
   const handleCopy = useCallback(async () => {
