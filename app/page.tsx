@@ -497,9 +497,10 @@ export default function Home() {
                   : "Days only, for a quicker read."}
               </div>
               <Button
+                variant="outline"
+                className="w-full sm:w-auto border-slate-200 bg-white/70 text-slate-900 hover:border-slate-300 hover:bg-white"
                 onClick={handleCopy}
                 disabled={copyDisabled}
-                className="w-full sm:w-auto"
               >
                 {copyLabel}
               </Button>
