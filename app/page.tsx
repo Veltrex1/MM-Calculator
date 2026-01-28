@@ -497,11 +497,11 @@ export default function Home() {
                   : "Days only, for a quicker read."}
               </div>
               <Button
-                className="w-full sm:w-auto bg-primary text-black hover:bg-primary/90 font-semibold"
+                className="w-full sm:w-auto bg-primary hover:bg-primary/90"
                 onClick={handleCopy}
                 disabled={copyDisabled}
               >
-                {copyLabel}
+                <span className="text-black font-semibold">{copyLabel}</span>
               </Button>
             </div>
           </CardFooter>
