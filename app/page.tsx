@@ -497,7 +497,7 @@ export default function Home() {
                   : "Days only, for a quicker read."}
               </div>
               <Button
-                className="w-full sm:w-auto bg-primary text-slate-900 hover:bg-primary/90"
+                className="w-full sm:w-auto bg-primary text-black hover:bg-primary/90"
                 onClick={handleCopy}
                 disabled={copyDisabled}
               >
