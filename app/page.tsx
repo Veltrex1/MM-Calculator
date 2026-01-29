@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { cn } from "@/lib/utils";
 
 type Mode = "basic" | "advanced";
 
@@ -244,6 +245,8 @@ export default function Home() {
     weddingTimezone,
   ]);
 
+  const resultVisible = result.status === "ready";
+
   const isReadyResult = (
     candidate: CalculationResult
   ): candidate is Extract<CalculationResult, { status: "ready" }> =>
@@ -463,7 +466,12 @@ export default function Home() {
             </Tabs>
           </CardContent>
           <CardFooter className="flex flex-col gap-4 px-6 pt-0 pb-6">
-            <div className="flex flex-wrap items-baseline gap-2">
+            <div
+              className={cn(
+                "flex flex-wrap items-baseline gap-2 transition-all duration-500 ease-out",
+                resultVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
+              )}
+            >
               <p className="text-xs uppercase tracking-[0.4em] text-muted-foreground">
                 MarriedMore Date
               </p>
