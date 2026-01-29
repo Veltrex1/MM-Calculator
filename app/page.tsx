@@ -333,8 +333,9 @@ export default function Home() {
   }, [ageDetail, copyDisabled, copyToClipboard, marriedMoreLabel, result]);
 
   return (
-    <main className="flex min-h-screen items-start justify-center px-6 pt-20 pb-12 lg:pb-16">
-      <div className="w-full max-w-5xl lg:max-w-6xl">
+    <main className="flex min-h-screen flex-col px-6 pt-20 pb-6 lg:pt-24 lg:pb-10">
+      <div className="flex-1 flex items-center justify-center w-full">
+        <div className="w-full max-w-5xl lg:max-w-6xl">
         <div className="mb-6 flex flex-col items-center gap-1 text-center">
           <p className="text-sm font-semibold uppercase tracking-[0.4em] text-muted-foreground">
             MarriedMore
@@ -506,6 +507,7 @@ export default function Home() {
             </div>
           </CardFooter>
         </Card>
+        </div>
       </div>
     </main>
   );
