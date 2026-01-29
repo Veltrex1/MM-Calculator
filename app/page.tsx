@@ -333,7 +333,7 @@ export default function Home() {
   }, [ageDetail, copyDisabled, copyToClipboard, marriedMoreLabel, result]);
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-6 py-12 lg:py-16">
+    <main className="flex min-h-screen items-start justify-center px-6 pt-20 pb-12 lg:pb-16">
       <div className="w-full max-w-5xl lg:max-w-6xl">
         <div className="mb-6 flex flex-col items-center gap-1 text-center">
           <p className="text-sm font-semibold uppercase tracking-[0.4em] text-muted-foreground">
