@@ -247,6 +247,8 @@ export default function Home() {
 
   const resultVisible = result.status === "ready";
 
+  const dateTransitionDelay = result.status === "ready" ? "300ms" : "0ms";
+
   const isReadyResult = (
     candidate: CalculationResult
   ): candidate is Extract<CalculationResult, { status: "ready" }> =>
@@ -475,7 +477,13 @@ export default function Home() {
               <p className="text-xs uppercase tracking-[0.4em] text-muted-foreground">
                 MarriedMore Date
               </p>
-              <p className="text-lg font-semibold text-slate-900">
+              <p
+                className={cn(
+                  "text-lg font-semibold text-slate-900 transition-opacity duration-300",
+                  resultVisible ? "opacity-100" : "opacity-0"
+                )}
+                style={{ transitionDelay: dateTransitionDelay }}
+              >
                 {marriedMoreLabel}
               </p>
             </div>
