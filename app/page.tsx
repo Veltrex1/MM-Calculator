@@ -469,20 +469,23 @@ export default function Home() {
           </CardContent>
           <CardFooter className="flex flex-col gap-4 px-6 pt-0 pb-6">
             <div
-              className={cn(
-                "flex flex-wrap items-baseline gap-2 transition-all duration-500 ease-out",
-                resultVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
-              )}
+            className={cn(
+              "flex flex-wrap items-baseline gap-2 transition-all duration-700 ease-out",
+              resultVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            )}
             >
               <p className="text-xs uppercase tracking-[0.4em] text-muted-foreground">
                 MarriedMore Date
               </p>
               <p
                 className={cn(
-                  "text-lg font-semibold text-slate-900 transition-opacity duration-300",
+                  "text-lg font-semibold text-slate-900 transition-opacity duration-400",
                   resultVisible ? "opacity-100" : "opacity-0"
                 )}
-                style={{ transitionDelay: dateTransitionDelay }}
+                style={{
+                  transitionDelay: dateTransitionDelay,
+                  transform: resultVisible ? "translateY(0)" : "translateY(8px)",
+                }}
               >
                 {marriedMoreLabel}
               </p>
