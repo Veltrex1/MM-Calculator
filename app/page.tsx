@@ -503,6 +503,11 @@ export default function Home() {
                   planned; the milestone always follows the ceremony.
                 </p>
               )}
+              {result.status === "ready" && (
+                <p className="text-xs font-semibold text-slate-900/90">
+                  Want help celebrating this day? We can remind you when it’s near.
+                </p>
+              )}
               {result.status === "error" && (
                 <p className="text-sm text-destructive">{result.message}</p>
               )}
